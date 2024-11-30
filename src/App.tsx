@@ -6,59 +6,98 @@ import './App.css';
 // api key
 // 49fe15ccbec548d1a36170638242911
 const key: string = '49fe15ccbec548d1a36170638242911';
-const cityies: string[] = ['Sevastopol', 'Moscow', 'New York', 'Los Angeles'];
 function App() {
     const [count, setCount] = useState(0);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [citys, setCitys] = useState('Sevastopol');
+
+    const [errors, setErrors] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const [inputCity, setInputCity] = useState('');
+    const [currentCity, setCurrentCity] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // Simulating a delay to show loading state
                 setTimeout(async () => {
-                    const response = await fetch(
-                        `http://api.weatherapi.com/v1/current.json?key=${key}&q=${citys}&aqi=yes`
-                    );
-                    const result = await response.json();
-                    setData(result);
-                    setLoading(false);
-                    console.log(result);
+                    if (currentCity.length !== 0) {
+                        const response = await fetch(
+                            `http://api.weatherapi.com/v1/current.json?key=${key}&q=${currentCity}&aqi=yes`
+                        );
+                        const result = await response.json();
+                        if (await result.error) {
+                            result.error.message
+                                ? setErrorMessage(result.error.message)
+                                : setErrorMessage('Unknown error!');
+                            setErrors(true);
+                            throw new Error(result.error.message);
+                        } else {
+                            setData(result);
+                            setLoading(false);
+                            setErrors(false);
+                        }
+                    }
+
+                    // console.log(result.error);
                 }, 1000);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+            } catch (error: any) {
+                console.error('Error fetching data:', error.message);
+                setErrors(true);
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, [citys]);
+    }, [currentCity]);
 
     function handleRadioButton(str: string) {
         setCitys(str);
     }
-
+    // console.log(errors);
+    function updateInputValue(evt: any) {
+        setInputCity(evt.target.value);
+    }
+    function handleKeyPress(evt: any) {
+        if (evt.key === 'Enter' && inputCity.length !== 0) {
+            setCurrentCity(inputCity);
+            console.log('Нажата клавиша Enter, ура!');
+        }
+    }
+    function searchBtnPress() {
+        if (inputCity.length !== 0) {
+            setCurrentCity(inputCity);
+        }
+    }
     return (
         <>
-            <h1>Vite + React</h1>
-            <div className="card">
-                {loading ? <p>wait, mf</p> : <h3>{data.current.temp_c}</h3>}
+            <div className="searchBlock">
+                <label>
+                    <input
+                        placeholder="Type your city and press button or Enter key..."
+                        type="text"
+                        className="searchCity"
+                        value={inputCity}
+                        onChange={(evt: any) => updateInputValue(evt)}
+                        onKeyDown={(evt: any) => handleKeyPress(evt)}
+                    />
+                    <button
+                        className="searchBtn"
+                        onClick={() => searchBtnPress()}
+                    >
+                        Search
+                    </button>
+                </label>
             </div>
-            <div>
-                {cityies.map((city, index) => {
-                    return (
-                        <label key={index}>
-                            <input
-                                type="radio"
-                                checked={city === citys}
-                                onChange={() => handleRadioButton(city)}
-                            />
-                            {city}
-                        </label>
-                    );
-                })}
-            </div>
+            <h1>Check temperuture in Celsius</h1>
+            {errors ? (
+                <h3>ERROR! {errorMessage}</h3>
+            ) : (
+                <div className="card">
+                    {loading ? <p>wait, mf</p> : <h3>{data.current.temp_c}</h3>}
+                </div>
+            )}
         </>
     );
 }
