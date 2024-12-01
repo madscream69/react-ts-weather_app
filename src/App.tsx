@@ -6,7 +6,7 @@ import './App.css';
 const key: string = '49fe15ccbec548d1a36170638242911';
 function App() {
     // const [count, setCount] = useState(0);
-    const [data, setData] = useState([]);
+    const [data, setData]: any[] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [errors, setErrors] = useState(false);
@@ -20,6 +20,7 @@ function App() {
             try {
                 // Simulating a delay to show loading state
                 setTimeout(async () => {
+                    setLoading(true);
                     if (currentCity.length !== 0) {
                         const response = await fetch(
                             `http://api.weatherapi.com/v1/current.json?key=${key}&q=${currentCity}&aqi=yes`
@@ -57,7 +58,6 @@ function App() {
     function handleKeyPress(evt: any) {
         if (evt.key === 'Enter' && inputCity.length !== 0) {
             setCurrentCity(inputCity);
-            console.log('Нажата клавиша Enter, ура!');
         }
     }
     function searchBtnPress() {
@@ -94,17 +94,59 @@ function App() {
                     {loading ? (
                         <p>wait, mf</p>
                     ) : (
-                        <h3>
-                            Temperature:{' '}
-                            {data.current.temp_c > 0
-                                ? `+${data.current.temp_c}`
-                                : data.current.temp_c}
-                            &deg;C /{' '}
-                            {data.current.temp_f > 0
-                                ? `+${data.current.temp_f}`
-                                : data.current.temp_f}
-                            &deg;F
-                        </h3>
+                        <>
+                            <img
+                                src={data.current.condition.icon}
+                                alt="icon_weather"
+                                className="icon"
+                            />
+                            <h3>{data.current.condition.text}</h3>
+                            <h3>
+                                Temperature:{' '}
+                                {data.current.temp_c > 0
+                                    ? `+${data.current.temp_c}`
+                                    : data.current.temp_c}
+                                &deg;C /{' '}
+                                {data.current.temp_f > 0
+                                    ? `+${data.current.temp_f}`
+                                    : data.current.temp_f}
+                                &deg;F
+                            </h3>
+                            <h3>
+                                Feels like:{' '}
+                                {data.current.feelslike_c > 0
+                                    ? `+${data.current.feelslike_c}`
+                                    : data.current.feelslike_c}
+                                &deg;C /{' '}
+                                {data.current.feelslike_f > 0
+                                    ? `+${data.current.feelslike_f}`
+                                    : data.current.feelslike_f}
+                                &deg;F
+                            </h3>
+                            <h3>
+                                Wind: {data.current.wind_mph} mph /{' '}
+                                {data.current.wind_kph} kph &#10;
+                                {data.current.wind_dir}
+                            </h3>
+                            <h3>Humidity: {data.current.humidity}%</h3>
+                            <h3>
+                                Pressure: {data.current.pressure_mb} mb /{' '}
+                                {data.current.pressure_in} in
+                            </h3>
+                            <h3>
+                                Precip: {data.current.precip_mm} mm /{' '}
+                                {data.current.precip_in} in
+                            </h3>
+                            <h3>
+                                Visibility: {data.current.vis_km} km /{' '}
+                                {data.current.vis_miles} miles
+                            </h3>
+                            <h3>Ultraviolet index: {data.current.uv}</h3>
+                            <h3>
+                                Gust: {data.current.gust_mph} mph /{' '}
+                                {data.current.gust_kph} kph
+                            </h3>
+                        </>
                     )}
                 </div>
             )}
