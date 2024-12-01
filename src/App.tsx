@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
 
 // api key
 // 49fe15ccbec548d1a36170638242911
 const key: string = '49fe15ccbec548d1a36170638242911';
 function App() {
-    const [count, setCount] = useState(0);
+    // const [count, setCount] = useState(0);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -52,9 +50,6 @@ function App() {
         fetchData();
     }, [currentCity]);
 
-    function handleRadioButton(str: string) {
-        setCitys(str);
-    }
     // console.log(errors);
     function updateInputValue(evt: any) {
         setInputCity(evt.target.value);
@@ -72,6 +67,7 @@ function App() {
     }
     return (
         <>
+            <h1>Check weather in your city</h1>
             <div className="searchBlock">
                 <label>
                     <input
@@ -90,12 +86,26 @@ function App() {
                     </button>
                 </label>
             </div>
-            <h1>Check temperuture in Celsius</h1>
+
             {errors ? (
                 <h3>ERROR! {errorMessage}</h3>
             ) : (
                 <div className="card">
-                    {loading ? <p>wait, mf</p> : <h3>{data.current.temp_c}</h3>}
+                    {loading ? (
+                        <p>wait, mf</p>
+                    ) : (
+                        <h3>
+                            Temperature:{' '}
+                            {data.current.temp_c > 0
+                                ? `+${data.current.temp_c}`
+                                : data.current.temp_c}
+                            &deg;C /{' '}
+                            {data.current.temp_f > 0
+                                ? `+${data.current.temp_f}`
+                                : data.current.temp_f}
+                            &deg;F
+                        </h3>
+                    )}
                 </div>
             )}
         </>
