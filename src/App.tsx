@@ -3,6 +3,10 @@ import './App.css';
 
 // api key
 // 49fe15ccbec548d1a36170638242911
+// current
+// `http://api.weatherapi.com/v1/current.json?key=${key}&q=${currentCity}&aqi=yes`
+// forecast
+// http://api.weatherapi.com/v1/forecast.json?key=49fe15ccbec548d1a36170638242911&q=London&days=7&aqi=yes&alerts=yes
 const key: string = '49fe15ccbec548d1a36170638242911';
 function App() {
     // const [count, setCount] = useState(0);
@@ -23,7 +27,7 @@ function App() {
                     setLoading(true);
                     if (currentCity.length !== 0) {
                         const response = await fetch(
-                            `http://api.weatherapi.com/v1/current.json?key=${key}&q=${currentCity}&aqi=yes`
+                            `http://api.weatherapi.com/v1/forecast.json?key=${key}&q=${currentCity}&days=7&aqi=yes&alerts=yes`
                         );
                         const result = await response.json();
                         if (await result.error) {
@@ -34,6 +38,7 @@ function App() {
                             throw new Error(result.error.message);
                         } else {
                             setData(result);
+
                             setLoading(false);
                             setErrors(false);
                         }
@@ -65,6 +70,7 @@ function App() {
             setCurrentCity(inputCity);
         }
     }
+
     return (
         <>
             {/* {!errors && !loading && data.current.condition.text ? (
@@ -106,6 +112,8 @@ function App() {
                             <p>Waiting...</p>
                         ) : (
                             <>
+                                {console.log(data.forecast.forecastday)}
+                                {console.log(new Date().getHours())}
                                 <div className="info__grid">
                                     <div className="info__grid-long">
                                         <div className="info__grid-location">
@@ -136,23 +144,43 @@ function App() {
                                             <p className="info__text">
                                                 Temperature:{' '}
                                                 {data.current.temp_c > 0
-                                                    ? `+${data.current.temp_c}`
-                                                    : data.current.temp_c}
-                                                &deg;C /{' '}
+                                                    ? `+${Math.round(
+                                                          data.current.temp_c
+                                                      )}`
+                                                    : Math.round(
+                                                          data.current.temp_c
+                                                      )}
+                                                &deg;C |{' '}
                                                 {data.current.temp_f > 0
-                                                    ? `+${data.current.temp_f}`
-                                                    : data.current.temp_f}
+                                                    ? `+${Math.round(
+                                                          data.current.temp_f
+                                                      )}`
+                                                    : Math.round(
+                                                          data.current.temp_f
+                                                      )}
                                                 &deg;F
                                             </p>
                                             <p className="info__text">
                                                 Feels like:{' '}
                                                 {data.current.feelslike_c > 0
-                                                    ? `+${data.current.feelslike_c}`
-                                                    : data.current.feelslike_c}
-                                                &deg;C /{' '}
+                                                    ? `+${Math.round(
+                                                          data.current
+                                                              .feelslike_c
+                                                      )}`
+                                                    : Math.round(
+                                                          data.current
+                                                              .feelslike_c
+                                                      )}
+                                                &deg;C |{' '}
                                                 {data.current.feelslike_f > 0
-                                                    ? `+${data.current.feelslike_f}`
-                                                    : data.current.feelslike_f}
+                                                    ? `+${Math.round(
+                                                          data.current
+                                                              .feelslike_f
+                                                      )}`
+                                                    : Math.round(
+                                                          data.current
+                                                              .feelslike_f
+                                                      )}
                                                 &deg;F
                                             </p>
                                         </div>
@@ -188,6 +216,108 @@ function App() {
                                         <p className="info__text">
                                             Ultraviolet index: {data.current.uv}
                                         </p>
+                                        <p className="info__text">
+                                            Local time:{' '}
+                                            {data.location.localtime}
+                                        </p>
+                                    </div>
+                                    <div className="timeline__grid">
+                                        {data.forecast.forecastday[0].hour.map(
+                                            (element: any, index: number) => {
+                                                if (
+                                                    new Date(
+                                                        element.time
+                                                    ).getHours() >=
+                                                    new Date(
+                                                        data.location.localtime
+                                                    ).getHours()
+                                                ) {
+                                                    return (
+                                                        <div
+                                                            className="timeline__block"
+                                                            key={index}
+                                                        >
+                                                            <p className="timeline__time">
+                                                                {element.time.slice(
+                                                                    11
+                                                                )}
+                                                            </p>
+                                                            <div className="img-wrapper">
+                                                                <img
+                                                                    className="timeline__img"
+                                                                    src={
+                                                                        element
+                                                                            .condition
+                                                                            .icon
+                                                                    }
+                                                                    alt="weather-icon"
+                                                                />
+                                                            </div>
+
+                                                            <p className="timeline__temp">
+                                                                {Math.round(
+                                                                    element.temp_c
+                                                                )}{' '}
+                                                                &deg;C |{' '}
+                                                                {Math.round(
+                                                                    element.temp_f
+                                                                )}{' '}
+                                                                &deg;F
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                }
+                                            }
+                                        )}
+                                        {/* <div className="timeline__block">
+                                        {
+                                            data.forecast.forecastday[0].hour[
+                                                new Date(
+                                                    data.location.localtime
+                                                ).getHours() - 1
+                                            ].time
+                                        }
+                                    </div> */}
+                                    </div>
+                                    <div className="forecast__grid">
+                                        {data.forecast.forecastday.map(
+                                            (element: any, index: number) => {
+                                                return (
+                                                    <div
+                                                        className="forecast__block"
+                                                        key={index}
+                                                    >
+                                                        <p className="forecast__time">
+                                                            {element.date}
+                                                        </p>
+                                                        <div className="img-wrapper">
+                                                            <img
+                                                                className="timeline__img"
+                                                                src={
+                                                                    element.day
+                                                                        .condition
+                                                                        .icon
+                                                                }
+                                                                alt="weather-icon"
+                                                            />
+                                                        </div>
+
+                                                        <p className="forecast__temp">
+                                                            {Math.round(
+                                                                element.day
+                                                                    .avgtemp_c
+                                                            )}{' '}
+                                                            &deg;C |{' '}
+                                                            {Math.round(
+                                                                element.day
+                                                                    .avgtemp_f
+                                                            )}{' '}
+                                                            &deg;F
+                                                        </p>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
                                     </div>
                                 </div>
                             </>
