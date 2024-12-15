@@ -10,6 +10,16 @@ import './App.css';
 const key: string = '49fe15ccbec548d1a36170638242911';
 function App() {
     // const [count, setCount] = useState(0);
+    const dayNames: string[] = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+    ];
+
     const [data, setData]: any[] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -279,6 +289,7 @@ function App() {
                                         }
                                     </div> */}
                                     </div>
+
                                     <div className="forecast__grid">
                                         {data.forecast.forecastday.map(
                                             (element: any, index: number) => {
@@ -288,7 +299,13 @@ function App() {
                                                         key={index}
                                                     >
                                                         <p className="forecast__time">
-                                                            {element.date}
+                                                            {`${
+                                                                dayNames[
+                                                                    new Date(
+                                                                        element.date
+                                                                    ).getDay()
+                                                                ]
+                                                            } `}
                                                         </p>
                                                         <div className="img-wrapper">
                                                             <img
